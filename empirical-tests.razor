@@ -1,0 +1,104 @@
+for 2000
+  if count 'iron ingot%s' < 25
+    say 'bank'
+    pause 1000
+    restock 1
+    waitfortarget
+    target 'self'
+    pause 1000
+    if count 'iron ingot%s' < 25
+      say 'still not enough ingots, bank is empty? stopping'
+      break
+    endif
+  endif
+
+  if count 'tool kit' < 2
+    say 'set blacksmith 0'
+    say 'set tinkering 100'
+    dclicktype 'tool kit' backpack
+    waitforgump 949095101
+    gumpresponse 8
+    waitforgump 949095101
+    gumpresponse 23
+    waitforgump 949095101 3000
+    say 'set tinkering 0'
+  endif
+
+  if count 'tongs' < 2
+    say 'set blacksmith 0'
+    say 'set tinkering 100'
+    for 5
+        dclicktype 'tool kit' backpack
+        waitforgump 949095101
+        gumpresponse 8
+        waitforgump 949095101
+        gumpresponse 86
+        waitforgump 949095101 3000
+    endfor
+    say 'set tinkering 0'
+  endif
+
+  say 'set str 10'
+  //say 'set blacksmith 0.0' // this gives us 1.0 shown skill, and 2.8% chance at a dagger
+  //say 'set blacksmith 7.0' // this gives us 7.9 shown skill, and 16.7% chance at a dagger
+  //say 'set blacksmith 11.2' // 12.0 shown skill, 0.2% chance at ringmail gloves
+  //say 'set blacksmith 27.3' // 28.0 shown skill, 0.1% chance at a longsword
+  //say 'set blacksmith 36.1' // 36.7 shown skill, 0.1% chance at a kryss
+  //say 'set blacksmith 48.5' // 49.0 shown skill, 0.0-0.1% chance at a spear (long)
+  say 'set blacksmith 58.5' // 58.9 shown skill, 0.0-0.1% chance at platemail gloves
+  //say 'set blacksmith 74.8' // 75.0 shown skill, 0.1% chance at a platemail tunic
+  //say 'set blacksmith 83.1' // 83.2 shown skill, 16.5% chance at a platemail tunic
+  //say 'set blacksmith 91.5' // 91.5 shown skill, 33.2% chance at a platemail tunic
+
+  dclicktype 'tongs' backpack
+
+  // make a dagger, minSkill 0.0
+  //waitforgump 949095101
+  //gumpresponse 36
+  //waitforgump 949095101
+  //gumpresponse 16
+
+  // make ringmail gloves, minskill 12.0
+  //waitforgump 949095101
+  //gumpresponse 1
+  //waitforgump 949095101
+  //gumpresponse 2
+
+  // make a longsword, minSkill 28.0
+  //waitforgump 949095101
+  //gumpresponse 36
+  //waitforgump 949095101
+  //gumpresponse 37
+
+  // make a kryss, minSkill 36.7
+  //waitforgump 949095101
+  //gumpresponse 36
+  //waitforgump 949095101
+  //gumpresponse 30
+
+  // make a spear, minSkill 49.0
+  //waitforgump 949095101
+  //gumpresponse 50
+  //waitforgump 949095101
+  //gumpresponse 23
+
+  // make platemail gloves, minSkill 58.9
+  waitforgump 949095101
+  gumpresponse 15
+  waitforgump 949095101
+  gumpresponse 9
+
+  // make a platemail tunic, minSkill 75.0
+  //waitforgump 949095101
+  //gumpresponse 15
+  //waitforgump 949095101
+  //gumpresponse 30
+
+  waitforgump 949095101 3000
+
+  if skill 'blacksmithy' > 58.9
+    say 'GAINED'
+  else
+    say 'NOPE'
+  endif
+endfor
