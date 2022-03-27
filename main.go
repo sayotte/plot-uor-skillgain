@@ -29,12 +29,91 @@ func main() {
 	}
 	fmt.Println()
 
-	makeSkillGainChart()
+	makeActualGainVsSkillChart()
+	makeExpectedSkillGainChart()
 	makeMageryCirclesChart()
 	printSimulations()
 }
 
-func makeSkillGainChart() {
+func makeActualGainVsSkillChart() {
+	samples := []struct{
+		x, y float64
+	}{
+		{x: 12.0, y: 0.23010},
+		{x: 28.0, y: 0.17416},
+		{x: 36.7, y: 0.17555},
+		{x: 49.0, y: 0.15500},
+		{x: 75.0, y: 0.08714},
+	}
+
+	var xVals, yVals []float64
+	for _, sample := range samples {
+		xVals = append(xVals, sample.x)
+		yVals = append(yVals, sample.y)
+	}
+
+	var xTicks []chart.Tick
+	for i := 0.0; i < 110.0; i += 10.0 {
+		xTicks = append(xTicks, chart.Tick{
+			Value: i,
+			Label: fmt.Sprintf("%.1f", i),
+		})
+	}
+
+	mainSeries := chart.ContinuousSeries{
+		Style: chart.Style{
+			StrokeWidth: chart.Disabled,
+			DotWidth: 5,
+		},
+		XValues: xVals,
+		YValues: yVals,
+	}
+	linRegSeries := &chart.LinearRegressionSeries{
+		InnerSeries: mainSeries,
+	}
+
+	whiteOnBlackBackgroundStyle := chart.Style{
+		FillColor: drawing.Color{0, 0, 0, 255},
+		FontColor: drawing.Color{128, 128, 128, 255},
+	}
+	graph := chart.Chart{
+		Title:      "% chance to gain skill, compared to base points in skill",
+		TitleStyle: whiteOnBlackBackgroundStyle,
+		Background: whiteOnBlackBackgroundStyle,
+		Canvas:     whiteOnBlackBackgroundStyle,
+		XAxis: chart.XAxis{
+			Name:           "Base skill while attempting",
+			NameStyle:      whiteOnBlackBackgroundStyle,
+			Style:          whiteOnBlackBackgroundStyle,
+			TickStyle:      whiteOnBlackBackgroundStyle,
+			GridMajorStyle: whiteOnBlackBackgroundStyle,
+			GridMinorStyle: whiteOnBlackBackgroundStyle,
+			Ticks: xTicks,
+		},
+		YAxis: chart.YAxis{
+			Name:           "% chance to gain",
+			NameStyle:      whiteOnBlackBackgroundStyle,
+			Style:          whiteOnBlackBackgroundStyle,
+			TickStyle:      whiteOnBlackBackgroundStyle,
+			GridMajorStyle: whiteOnBlackBackgroundStyle,
+			GridMinorStyle: whiteOnBlackBackgroundStyle,
+		},
+		Series: []chart.Series{
+			mainSeries,
+			linRegSeries,
+		},
+	}
+	fd, err := os.Create("gains-vs-base-skill.png")
+	if err != nil {
+		panic(err)
+	}
+	defer fd.Close()
+	if err := graph.Render(chart.PNG, fd); err != nil {
+		panic(err)
+	}
+}
+
+func makeExpectedSkillGainChart() {
 	xVals := make([]float64, 0, 500)
 	yVals := make([]float64, 0, 500)
 	for i := 0.0; i <= 1.0; i += 0.01 {
@@ -44,6 +123,11 @@ func makeSkillGainChart() {
 		}
 		xVals = append(xVals, i)
 		yVals = append(yVals, y)
+	}
+
+	mainSeries := chart.ContinuousSeries{
+		XValues: xVals,
+		YValues: yVals,
 	}
 
 	whiteOnBlackBackgroundStyle := chart.Style{
@@ -72,10 +156,7 @@ func makeSkillGainChart() {
 			GridMinorStyle: whiteOnBlackBackgroundStyle,
 		},
 		Series: []chart.Series{
-			chart.ContinuousSeries{
-				XValues: xVals,
-				YValues: yVals,
-			},
+			mainSeries,
 		},
 	}
 	fd, err := os.Create("gains-vs-success.png")
