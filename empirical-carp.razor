@@ -1,0 +1,60 @@
+for 3000
+  if count 'table' > 2
+    organizer 1
+    pause 1200
+  endif
+
+  if count 'board%s' < 54
+    say 'bank'
+    pause 1000
+    restock 2
+    waitfortarget
+    target 'self'
+    pause 1000
+  endif
+
+  if count 'tool kit' < 2
+    say 'set carpentry 0'
+    say 'set tinkering 100'
+    dclicktype 'tool kit' backpack
+    waitforgump 949095101
+    gumpresponse 8
+    waitforgump 949095101
+    gumpresponse 23
+    waitforgump 949095101 3000
+    say 'set tinkering 0'
+  endif
+
+  if count 'draw knife' < 2
+    say 'set carpentry 0'
+    say 'set tinkering 100'
+    for 5
+        dclicktype 'tool kit' backpack
+        waitforgump 949095101
+        gumpresponse 8
+        waitforgump 949095101
+        gumpresponse 37
+        waitforgump 949095101 3000
+    endfor
+    say 'set tinkering 0'
+  endif
+
+  say 'set str 10'
+  say 'set carpentry 83.7' // shown skill 84.2, 50.1% chance to succeed
+
+  dclicktype 'draw knife' backpack
+
+  // make a Yew-wood table, minSkill 84.2
+  waitforgump 949095101
+  gumpresponse 8
+  waitforgump 949095101
+  gumpresponse 86
+
+  waitforgump 949095101 3000
+
+  if skill 'carpentry' > 84.2
+    say 'GAINED'
+  else
+    say 'NOPE'
+  endif
+endfor
