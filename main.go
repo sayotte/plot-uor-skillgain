@@ -29,27 +29,85 @@ func main() {
 	}
 	fmt.Println()
 
-	makeActualGainVsSkillChart()
+	makeActualGainVsShownSkillChart()
+	makeActualGainVsBaseSkillChart()
 	makeExpectedSkillGainChart()
 	makeMageryCirclesChart()
 	printSimulations()
 }
 
-func makeActualGainVsSkillChart() {
-	samples := []struct{
-		x, y float64
-	}{
+func makeActualGainVsShownSkillChart() {
+	samples := []sample{
 		{x: 12.0, y: 0.23010},
+		{x: 14.5, y: 0.21900},
+		{x: 19.4, y: 0.20700},
 		{x: 28.0, y: 0.17416},
+		{x: 35.4, y: 0.16450},
 		{x: 36.7, y: 0.17555},
 		{x: 49.0, y: 0.15500},
+		{x: 58.9, y: 0.11950},
+		{x: 68.8, y: 0.11458},
 		{x: 75.0, y: 0.08714},
 	}
+	var expected []sample
+	for currentSkill := 0.0; currentSkill <= 100.0; currentSkill += 1.0 {
+		expected = append(expected, sample{
+			x: currentSkill,
+			y: (100.0 - currentSkill) / 100.0 / 4,
+		})
+	}
 
-	var xVals, yVals []float64
+	makeScatterChartWithLinearRegression(
+		samples,
+		expected,
+		"% chance to gain skill, compared to shown skill",
+		"Shown skill while attempting",
+		"% chance to gain",
+		"gains-vs-shown-skill.png",
+	)
+}
+
+func makeActualGainVsBaseSkillChart() {
+	samples := []sample{
+		{x: 11.2, y: 0.23010},
+		{x: 13.7, y: 0.21900},
+		{x: 18.6, y: 0.20700},
+		{x: 27.3, y: 0.17416},
+		{x: 34.8, y: 0.16450},
+		{x: 36.1, y: 0.17555},
+		{x: 48.5, y: 0.15500},
+		{x: 58.5, y: 0.11950},
+		{x: 68.5, y: 0.11458},
+		{x: 74.8, y: 0.08714},
+	}
+	var expected []sample
+	for currentSkill := 0.0; currentSkill <= 100.0; currentSkill += 1.0 {
+		expected = append(expected, sample{
+			x: currentSkill,
+			y: (100.0 - currentSkill) / 100.0 / 4,
+		})
+	}
+	makeScatterChartWithLinearRegression(
+		samples,
+		expected,
+		"% chance to gain skill, compared to base skill",
+		"Base skill while attempting",
+		"% chance to gain",
+		"gains-vs-base-skill.png",
+	)
+}
+
+type sample struct {x, y float64}
+
+func makeScatterChartWithLinearRegression(samples, expected []sample, title, xLabel, yLabel, filename string) {
+	var xVals, yVals, expX, expY[]float64
 	for _, sample := range samples {
 		xVals = append(xVals, sample.x)
 		yVals = append(yVals, sample.y)
+	}
+	for _, expectedSample := range expected {
+		expX = append(expX, expectedSample.x)
+		expY = append(expY, expectedSample.y)
 	}
 
 	var xTicks []chart.Tick
@@ -69,7 +127,16 @@ func makeActualGainVsSkillChart() {
 		YValues: yVals,
 	}
 	linRegSeries := &chart.LinearRegressionSeries{
+		Name: "Observed",
 		InnerSeries: mainSeries,
+	}
+	expectedSeries := chart.ContinuousSeries{
+		Name: "Expected",
+		Style: chart.Style{
+			StrokeColor: drawing.ColorRed,
+		},
+		XValues: expX,
+		YValues: expY,
 	}
 
 	whiteOnBlackBackgroundStyle := chart.Style{
@@ -77,12 +144,12 @@ func makeActualGainVsSkillChart() {
 		FontColor: drawing.Color{128, 128, 128, 255},
 	}
 	graph := chart.Chart{
-		Title:      "% chance to gain skill, compared to base points in skill",
+		Title: title,
 		TitleStyle: whiteOnBlackBackgroundStyle,
 		Background: whiteOnBlackBackgroundStyle,
 		Canvas:     whiteOnBlackBackgroundStyle,
 		XAxis: chart.XAxis{
-			Name:           "Base skill while attempting",
+			Name:           xLabel,
 			NameStyle:      whiteOnBlackBackgroundStyle,
 			Style:          whiteOnBlackBackgroundStyle,
 			TickStyle:      whiteOnBlackBackgroundStyle,
@@ -91,7 +158,7 @@ func makeActualGainVsSkillChart() {
 			Ticks: xTicks,
 		},
 		YAxis: chart.YAxis{
-			Name:           "% chance to gain",
+			Name:           yLabel,
 			NameStyle:      whiteOnBlackBackgroundStyle,
 			Style:          whiteOnBlackBackgroundStyle,
 			TickStyle:      whiteOnBlackBackgroundStyle,
@@ -101,9 +168,15 @@ func makeActualGainVsSkillChart() {
 		Series: []chart.Series{
 			mainSeries,
 			linRegSeries,
+			expectedSeries,
 		},
 	}
-	fd, err := os.Create("gains-vs-base-skill.png")
+	//note we have to do this as a separate step because we need a reference to graph
+	graph.Elements = []chart.Renderable{
+		chart.Legend(&graph),
+	}
+
+	fd, err := os.Create(filename)
 	if err != nil {
 		panic(err)
 	}

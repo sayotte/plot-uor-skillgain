@@ -1,4 +1,4 @@
-for 2000
+for 3000
   if count 'iron ingot%s' < 25
     say 'bank'
     pause 1000
@@ -42,10 +42,14 @@ for 2000
   //say 'set blacksmith 0.0' // this gives us 1.0 shown skill, and 2.8% chance at a dagger
   //say 'set blacksmith 7.0' // this gives us 7.9 shown skill, and 16.7% chance at a dagger
   //say 'set blacksmith 11.2' // 12.0 shown skill, 0.2% chance at ringmail gloves
+  //say 'set blacksmith 13.7' // 14.5 shown skill, 0.1% chance at a mace
+  //say 'set blacksmith 18.6' // 19.4 shown skill, 0.0-0.1% chance at a maul
   //say 'set blacksmith 27.3' // 28.0 shown skill, 0.1% chance at a longsword
+  //say 'set blacksmith 34.8' // 35.4 shown skill, 0.1% chance at a broadsword
   //say 'set blacksmith 36.1' // 36.7 shown skill, 0.1% chance at a kryss
   //say 'set blacksmith 48.5' // 49.0 shown skill, 0.0-0.1% chance at a spear (long)
-  say 'set blacksmith 58.5' // 58.9 shown skill, 0.0-0.1% chance at platemail gloves
+  //say 'set blacksmith 58.5' // 58.9 shown skill, 0.0-0.1% chance at platemail gloves
+  say 'set blacksmith 68.5' // 68.8 shown skill, 0.0-0.1% chance at platemail legs
   //say 'set blacksmith 74.8' // 75.0 shown skill, 0.1% chance at a platemail tunic
   //say 'set blacksmith 83.1' // 83.2 shown skill, 16.5% chance at a platemail tunic
   //say 'set blacksmith 91.5' // 91.5 shown skill, 33.2% chance at a platemail tunic
@@ -64,11 +68,29 @@ for 2000
   //waitforgump 949095101
   //gumpresponse 2
 
+  // make a mace, minSkill 14.5
+  //waitforgump 949095101
+  //gumpresponse 57
+  //waitforgump 949095101
+  //gumpresponse 9
+
+  // make a maul, minSkill 19.4
+  //waitforgump 949095101
+  //gumpresponse 57
+  //waitforgump 949095101
+  //gumpresponse 16
+
   // make a longsword, minSkill 28.0
   //waitforgump 949095101
   //gumpresponse 36
   //waitforgump 949095101
   //gumpresponse 37
+
+  // make a broadsword, minSkill 35.4
+  //waitforgump 949095101
+  //gumpresponse 36
+  //waitforgump 949095101
+  //gumpresponse 2
 
   // make a kryss, minSkill 36.7
   //waitforgump 949095101
@@ -83,10 +105,16 @@ for 2000
   //gumpresponse 23
 
   // make platemail gloves, minSkill 58.9
+  //waitforgump 949095101
+  //gumpresponse 15
+  //waitforgump 949095101
+  //gumpresponse 9
+
+  // make platemail gloves, minSkill 58.9
   waitforgump 949095101
   gumpresponse 15
   waitforgump 949095101
-  gumpresponse 9
+  gumpresponse 23
 
   // make a platemail tunic, minSkill 75.0
   //waitforgump 949095101
@@ -96,7 +124,7 @@ for 2000
 
   waitforgump 949095101 3000
 
-  if skill 'blacksmithy' > 58.9
+  if skill 'blacksmithy' > 68.8
     say 'GAINED'
   else
     say 'NOPE'
